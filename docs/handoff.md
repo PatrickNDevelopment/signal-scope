@@ -1,7 +1,10 @@
 # Handoff
 
 **State:** v0.1 built locally on branch `phase/05a-build`. Not pushed, not deployed, no remote.
-Registry status `in_progress` until an independent acceptance review (prompt 05B) passes.
+The independent acceptance review (05B, 2026-10-18) reran the gate from a clean clone, exercised
+both journeys on the production build, fixed eight defects with regression tests and found no
+blocking issue; see Part 1 of `docs/test-report.md`. The registry status is for the lead engineer to
+update after re-running that evidence.
 
 ## Run
 
@@ -35,7 +38,8 @@ npm run e2e          # production build + Playwright on port 4177
 
 ## Release blockers before publication
 
-1. Independent acceptance review (05B).
+1. ~~Independent acceptance review (05B).~~ Done; lead engineer to re-run `scripts\verify.ps1`
+   and update `portfolio-control/projects.json`.
 2. Owner review and explicit approval to publish.
 3. First CI run on Linux.
 
@@ -45,3 +49,7 @@ npm run e2e          # production build + Playwright on port 4177
 - `npm run e2e` rewrites `docs/screenshots`; restore with `git checkout docs/screenshots` unless the
   UI changed.
 - Changing `src/engine/sample.ts` changes the journey 2 numbers; the unit and e2e tests pin them.
+- Rule conditions on another market's probabilities only see values dated **before** the signal
+  session (spec 00 rule 3); keep that if you add cross-series conditions.
+- Exports go through `src/ui/ExportButton.tsx`, which enforces the restricted-data opt-in; CSV
+  comment text goes through `commentText` in `src/engine/csv.ts` (one cell, no commas or quotes).
