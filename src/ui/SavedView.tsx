@@ -3,6 +3,8 @@ import { useId, useState } from 'react';
 import { parseWorkspaceJson, type SavedConfig, type Workspace } from '../engine';
 import { download } from '../lib/files';
 import { DISCLAIMER } from '../lib/format';
+import { hasRestricted } from '../lib/exports';
+import { ExportButton } from './ExportButton';
 
 export function SavedView(props: {
   ws: Workspace;
@@ -104,18 +106,17 @@ export function SavedView(props: {
 
       <h3>Workspace file</h3>
       <div className="card inline-group">
-        <button
-          type="button"
-          onClick={() =>
+        <ExportButton
+          label="Export workspace JSON"
+          restricted={hasRestricted(props.ws.series, props.ws.events)}
+          onExport={() =>
             download(
               'signal-scope-workspace.json',
               `${JSON.stringify(props.ws, null, 2)}\n`,
               'application/json',
             )
           }
-        >
-          Export workspace JSON
-        </button>
+        />
         <label htmlFor={fileId} className="inline">
           Import workspace JSON (replaces the current one)
           <input id={fileId} type="file" accept=".json,application/json" onChange={onFile} />

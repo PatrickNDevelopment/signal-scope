@@ -12,7 +12,7 @@ only information available at the end of `t` (spec 00 rule 3). Condition types:
 | `rsi_above`    | `level`                             | `RSI_t > level`                                                                                                     |
 | `return_below` | `h`, `pct`                          | cumulative return over the last `h` sessions `<= pct`                                                               |
 | `event_recent` | `kind`, `direction` or any, `days`  | an event of that kind (and direction) for the target has its anchor within the last `days` sessions (anchor `<= t`) |
-| `prob_change`  | probability series id, `h`, `ppMin` | `dp_t(h) >= ppMin` (percentage points) on that series, matched by date `<= t`                                       |
+| `prob_change`  | probability series id, `h`, `ppMin` | `dp_t(h) >= ppMin` (percentage points) on that series, latest value dated **before** `t` (spec 00 rule 3)           |
 
 Rules need **at least two evidence types** (the task is to cross evidence, not to fire on one
 indicator). Output: every session where the rule fires, and for each, the forward return over the
@@ -47,8 +47,10 @@ all-or-nothing per file. Limits: 5 MB per file, 20,000 rows per series, 2,000 ev
 - Event-study table CSV (one row per event, with anchor date, delay, baseline n, CAR pre/post, reason
   for exclusion) plus an aggregate block; indicator CSV; rule-hit CSV; backtest trade CSV.
 - Every export starts with comment lines (`# ...`) stating the data provenance, the parameters and
-  "Descriptive historical calculation. Not investment advice."
-- Spreadsheet-formula guard: a cell starting with `=`, `+`, `-`, `@`, tab or CR that is not a number is
-  prefixed with `'`.
+  "Descriptive historical calculation. Not investment advice." A comment line is always a single
+  cell: commas in it become `;` and double quotes `'`, so user text (a source, a rule name) cannot
+  open a new spreadsheet cell.
+- Spreadsheet-formula guard: a text cell starting (after optional whitespace) with `=`, `+`, `-`,
+  `@`, their full-width forms, tab or CR that is not a plain number is prefixed with `'`.
 - Saved configurations (study parameters, rules, backtest settings) live in `localStorage` with a
   schema version; a workspace (data + configurations) can be exported and imported as JSON.

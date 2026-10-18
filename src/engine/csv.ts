@@ -139,8 +139,10 @@ export function importSeriesCsv(
     let vol: number | null = null;
     if (iVol >= 0) {
       const raw = num(c[iVol] ?? '');
-      if (raw === 'bad' || (raw !== null && (raw < 0 || !Number.isInteger(raw)))) {
-        errors.push(`line ${row.line}: volume "${c[iVol] ?? ''}" must be a whole number >= 0`);
+      if (raw === 'bad' || (raw !== null && (raw < 0 || !Number.isSafeInteger(raw)))) {
+        errors.push(
+          `line ${row.line}: volume "${c[iVol] ?? ''}" must be a whole number from 0 to 9007199254740991`,
+        );
         continue;
       }
       vol = raw;
@@ -268,8 +270,22 @@ export function importEventsCsv(
 export function csvCell(v: string | number | null | undefined): string {
   if (v === null || v === undefined || (typeof v === 'number' && !Number.isFinite(v))) return '';
   let s = typeof v === 'number' ? String(v) : v;
-  if (typeof v === 'string' && /^[=+\-@\t\r]/.test(s) && !/^[-+]?\d+(\.\d+)?$/.test(s)) s = `'${s}`;
+  // Also catches leading whitespace and full-width = + - @, which some spreadsheets normalise.
+  if (typeof v === 'string' && /^\s*[=+\-@\t\r＝＋－＠]/.test(s) && !/^[-+]?\d+(\.\d+)?$/.test(s))
+    s = `'${s}`;
   return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+}
+
+/**
+ * A comment line must stay ONE cell that starts with "#". A comma would open a new cell in a
+ * spreadsheet, where user text such as a source "x,=HYPERLINK(...)" would become a formula, and a
+ * double quote could change how the line is split. Commas become ";" and double quotes "'".
+ */
+export function commentText(c: string): string {
+  return c
+    .replace(/[\r\n]+/g, ' ')
+    .replace(/,/g, ';')
+    .replace(/"/g, "'");
 }
 
 export function toCsv(
@@ -277,7 +293,7 @@ export function toCsv(
   header: string[],
   rows: (string | number | null | undefined)[][],
 ): string {
-  const lines = comments.map((c) => `# ${c.replace(/[\r\n]+/g, ' ')}`);
+  const lines = comments.map((c) => `# ${commentText(c)}`);
   lines.push(header.map(csvCell).join(','));
   for (const r of rows) lines.push(r.map(csvCell).join(','));
   return `${lines.join('\r\n')}\r\n`;

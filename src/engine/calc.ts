@@ -9,11 +9,12 @@ export function returns(series: Series): Num[] {
   for (let i = 1; i < p.length; i += 1) {
     const a = p[i - 1]?.value;
     const b = p[i]?.value;
-    out.push(
+    const r =
       a === null || a === undefined || b === null || b === undefined || a === 0
         ? undefined
-        : b / a - 1,
-    );
+        : b / a - 1;
+    // Extreme inputs (e.g. 1e-300 then 1e300) overflow; an infinite return is "not defined".
+    out.push(r !== undefined && Number.isFinite(r) ? r : undefined);
   }
   return out;
 }

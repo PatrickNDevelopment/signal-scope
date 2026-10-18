@@ -15,8 +15,10 @@ import {
 import { int } from '../lib/format';
 import { PriceChart } from './charts';
 
-function today(): string {
-  return new Date().toISOString().slice(0, 10);
+/** Today's date in the user's own time zone (toISOString would give the UTC date). */
+function localToday(now: Date = new Date()): string {
+  const p = (n: number): string => String(n).padStart(2, '0');
+  return `${now.getFullYear()}-${p(now.getMonth() + 1)}-${p(now.getDate())}`;
 }
 
 async function readFile(
@@ -48,7 +50,7 @@ function SeriesImport(props: { ws: Workspace; onChange: (ws: Workspace, msg: str
   const [symbol, setSymbol] = useState('');
   const [source, setSource] = useState('');
   const [access, setAccess] = useState<Access>('public');
-  const [retrievedAt, setRetrievedAt] = useState(today());
+  const [retrievedAt, setRetrievedAt] = useState(localToday());
   const [errors, setErrors] = useState<string[]>([]);
 
   async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
@@ -126,6 +128,7 @@ function SeriesImport(props: { ws: Workspace; onChange: (ws: Workspace, msg: str
             <option value="public">Public</option>
             <option value="licensed">Licensed</option>
             <option value="restricted">Restricted</option>
+            <option value="synthetic">Synthetic (invented data)</option>
           </select>
         </label>
         <label>
@@ -148,7 +151,7 @@ function SeriesImport(props: { ws: Workspace; onChange: (ws: Workspace, msg: str
 
 function EventsImport(props: { ws: Workspace; onChange: (ws: Workspace, msg: string) => void }) {
   const id = useId();
-  const [retrievedAt, setRetrievedAt] = useState(today());
+  const [retrievedAt, setRetrievedAt] = useState(localToday());
   const [errors, setErrors] = useState<string[]>([]);
 
   async function onFile(e: React.ChangeEvent<HTMLInputElement>) {

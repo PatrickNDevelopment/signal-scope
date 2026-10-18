@@ -14,23 +14,61 @@ import {
 } from '../engine';
 import { DISCLAIMER } from './format';
 
+type Condition = Rule['conditions'][number];
+
+/** A readable, comma-free description of a condition for export comments. */
+export function describeCondition(c: Condition): string {
+  switch (c.type) {
+    case 'volume_shock':
+      return `volume z (prior ${c.n} sessions) >= ${c.zMin}`;
+    case 'rsi_below':
+      return `RSI 14 < ${c.level}`;
+    case 'rsi_above':
+      return `RSI 14 > ${c.level}`;
+    case 'return_below':
+      return `return over ${c.h} sessions <= ${c.pct} %`;
+    case 'event_recent':
+      return `${c.kind} event (direction ${c.direction ?? 'any'}) with day 0 in the last ${c.days} sessions`;
+    case 'prob_change':
+      return `${c.seriesId} probability change over ${c.h} sessions >= ${c.ppMin} pp (values dated before the signal)`;
+  }
+}
+
+/** True when any of the given data is labelled restricted (exports then need explicit consent). */
+export function hasRestricted(
+  series: readonly Series[],
+  events: readonly MarketEvent[] = [],
+): boolean {
+  return (
+    series.some((s) => s.provenance.access === 'restricted') ||
+    events.some((e) => e.provenance.access === 'restricted')
+  );
+}
+
+const RESTRICTED_NOTE =
+  'CONTAINS DATA LABELLED RESTRICTED: the user confirmed they may export it. Check the licence before sharing.';
+
+function restrictedLines(series: readonly Series[], events: readonly MarketEvent[]): string[] {
+  return hasRestricted(series, events) ? [RESTRICTED_NOTE] : [];
+}
+
 const TIME_RULE =
   'Information time: day 0 is the first session strictly after publication; signals act from the next session.';
 
 function provenanceLines(series: readonly Series[], events: readonly MarketEvent[]): string[] {
   const out = series.map(
     (s) =>
-      `Series ${s.id}: ${s.provenance.source} (access ${s.provenance.access}, retrieved ${s.provenance.retrievedAt}${s.provenance.sample ? ', SAMPLE DATA' : ''})`,
+      `Series ${s.id}: ${s.provenance.source} (access ${s.provenance.access}; retrieved ${s.provenance.retrievedAt}${s.provenance.sample ? '; SAMPLE DATA' : ''})`,
   );
   const sources = new Map<string, string>();
   for (const e of events) {
     const k = `${e.provenance.source}|${e.provenance.access}|${e.provenance.sample}`;
     sources.set(
       k,
-      `Events from ${e.provenance.source} (access ${e.provenance.access}${e.provenance.sample ? ', SAMPLE DATA' : ''})`,
+      `Events from ${e.provenance.source} (access ${e.provenance.access}${e.provenance.sample ? '; SAMPLE DATA' : ''})`,
     );
   }
-  return [...out, ...sources.values()];
+  return [...restrictedLines(series, events), ...out, ...sources.values()];
 }
 
 export function studyCsv(res: StudyResult, series: Series): string {
@@ -65,6 +103,9 @@ export function studyCsv(res: StudyResult, series: Series): string {
     'raw_post',
     'excluded',
     'overlaps',
+    'source',
+    'access',
+    'sample',
   ];
   const rows: (string | number | null)[][] = res.rows.map((r) => [
     r.event.id,
@@ -85,6 +126,9 @@ export function studyCsv(res: StudyResult, series: Series): string {
     r.rawPost,
     r.excluded ?? '',
     r.overlaps ? 'yes' : 'no',
+    r.event.provenance.source,
+    r.event.provenance.access,
+    r.event.provenance.sample ? 'yes' : 'no',
   ]);
   rows.push([]);
   rows.push([
@@ -136,7 +180,7 @@ export function hitsCsv(
       DISCLAIMER,
       TIME_RULE,
       ...provenanceLines(series, events),
-      `Rule "${rule.name}" on ${rule.targetId}; horizon ${rule.horizon} sessions; conditions ${JSON.stringify(rule.conditions)}`,
+      `Rule "${rule.name}" on ${rule.targetId}; horizon ${rule.horizon} sessions; conditions: ${rule.conditions.map(describeCondition).join(' AND ')}`,
     ],
     ['signal', 'entry', 'exit', 'forward_return'],
     res.hits.map((h) => [h.signal, h.entry, h.exit, h.forward]),
@@ -192,6 +236,7 @@ export function tradesCsv(
       DISCLAIMER,
       TIME_RULE,
       ...provenanceLines(series, events),
+      `Conditions: ${rule.conditions.map(describeCondition).join(' AND ')}`,
       `Rule "${rule.name}" on ${rule.targetId}; horizon ${rule.horizon}; split ${bt.split} (trades entering before it are train); cost ${bt.costBps} bps per side; one position at a time`,
     ],
     ['period', 'signal', 'entry', 'exit', 'gross', 'net', 'crosses_split'],

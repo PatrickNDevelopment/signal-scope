@@ -12,7 +12,8 @@ import {
 } from '../engine';
 import { download } from '../lib/files';
 import { DISCLAIMER, pct } from '../lib/format';
-import { studyCsv } from '../lib/exports';
+import { hasRestricted, studyCsv } from '../lib/exports';
+import { ExportButton } from './ExportButton';
 import { PathChart, PriceChart } from './charts';
 
 const KINDS: EventKind[] = ['catalyst', 'disclosure', 'prediction'];
@@ -83,16 +84,15 @@ export function StudyView(props: {
     <section aria-labelledby="study-h">
       <div className="row-between">
         <h2 id="study-h">Event study</h2>
-        <button
-          type="button"
+        <ExportButton
+          label="Export study CSV"
           disabled={!res}
-          onClick={() =>
+          restricted={hasRestricted([series], res ? res.rows.map((r) => r.event) : [])}
+          onExport={() =>
             res &&
             download(`signal-scope-event-study-${series.id}.csv`, studyCsv(res, series), 'text/csv')
           }
-        >
-          Export study CSV
-        </button>
+        />
       </div>
       <fieldset className="card controls">
         <legend>Parameters</legend>

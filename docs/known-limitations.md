@@ -16,3 +16,12 @@
   size; the app reports a failed save and asks you to export JSON.
 - **No live or authorized data adapters**; all data are imported files or the synthetic sample.
 - CI and the Pages workflow exist but have never run, because the repository has no remote.
+- **Same-day cross-market data is held back one session.** Prediction-market probabilities dated on
+  a signal session are not used until the next session (dates carry no time). For a market that
+  closes with the target this is one session conservative.
+- **"Load sample market" is offered only on an empty workspace.** To add the sample next to your
+  own data, export your workspace, clear it, load the sample, then re-import your files.
+- **A period with no trades shows a compounded return and drawdown of 0 %** (no position, so no
+  change), flagged "very few trades"; it is not evidence that the rule avoided losses.
+- **The train/test split assigns trades by entry date**, so a signal on the last train session whose
+  entry falls after the split counts as test. There is no walk-forward evaluation.

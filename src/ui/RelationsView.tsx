@@ -11,7 +11,8 @@ import {
 } from '../engine';
 import { download } from '../lib/files';
 import { DISCLAIMER, num, pct } from '../lib/format';
-import { indicatorsCsv } from '../lib/exports';
+import { hasRestricted, indicatorsCsv } from '../lib/exports';
+import { ExportButton } from './ExportButton';
 import { CorrBars } from './charts';
 
 function last<T>(xs: readonly (T | undefined)[]): { v: T | undefined; i: number } {
@@ -73,18 +74,17 @@ export function RelationsView(props: { series: Series[] }) {
                 ))}
               </select>
             </label>
-            <button
-              type="button"
-              onClick={() =>
+            <ExportButton
+              label="Export indicators CSV"
+              restricted={hasRestricted([a])}
+              onExport={() =>
                 download(
                   `signal-scope-indicators-${a.id}.csv`,
                   indicatorsCsv(a, 20, 14, 20),
                   'text/csv',
                 )
               }
-            >
-              Export indicators CSV
-            </button>
+            />
           </div>
         </div>
         <dl className="kv">

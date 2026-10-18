@@ -10,8 +10,11 @@ market-data connections and no secrets. Nothing you import leaves the browser.
 | `localStorage` contents | Untrusted. Re-validated on load; an unreadable copy is kept aside and can be downloaded.                                  |
 | Typed text              | Rendered as React text nodes, never as HTML.                                                                              |
 
-CSV exports neutralise spreadsheet formulas: a text cell that starts with `=`, `+`, `-`, `@`, tab or
-carriage return and is not a number gets a leading apostrophe. Comment lines carry provenance.
+CSV exports neutralise spreadsheet formulas: a text cell that starts (after optional whitespace) with
+`=`, `+`, `-`, `@` (or their full-width forms), tab or carriage return and is not a number gets a
+leading apostrophe. Comment lines carry provenance and are always one cell: commas become `;` and
+double quotes `'`, so text such as a source name cannot start a formula cell. Exports that contain
+data labelled `restricted` stay disabled until "Include restricted data" is ticked.
 
 ## Ethics
 

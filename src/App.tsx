@@ -188,7 +188,15 @@ export function App() {
 
   return (
     <div className="app">
-      <a className="skip" href="#main">
+      <a
+        className="skip"
+        href="#main"
+        onClick={(e) => {
+          // Hash routing: following "#main" would replace the route and open the Data page.
+          e.preventDefault();
+          document.getElementById('main')?.focus();
+        }}
+      >
         Skip to content
       </a>
       <header className="top">

@@ -16,7 +16,8 @@ import {
 } from '../engine';
 import { download } from '../lib/files';
 import { DISCLAIMER, pct } from '../lib/format';
-import { hitsCsv, tradesCsv } from '../lib/exports';
+import { hasRestricted, hitsCsv, tradesCsv } from '../lib/exports';
+import { ExportButton } from './ExportButton';
 
 const TYPES: { type: Condition['type']; label: string }[] = [
   { type: 'event_recent', label: 'Event published recently' },
@@ -361,8 +362,9 @@ export function RulesView(props: {
         </div>
         <p className="small muted">
           All conditions must hold at a session&apos;s close (the signal). Entry is the next
-          session; exit is {rule.horizon} sessions after entry. Conditions only see data dated on or
-          before the signal, and events only from their day 0.
+          session; exit is {rule.horizon} sessions after entry. Conditions only see the
+          target&apos;s data dated on or before the signal, other markets&apos; probabilities dated
+          before it, and events only from their day 0.
         </p>
         <div className="conditions">
           {rule.conditions.map((c, i) => (
@@ -416,9 +418,10 @@ export function RulesView(props: {
         <div className="card">
           <div className="row-between">
             <h3>Historical observations</h3>
-            <button
-              type="button"
-              onClick={() =>
+            <ExportButton
+              label="Export hits CSV"
+              restricted={hasRestricted(series, events)}
+              onExport={() =>
                 out.hits &&
                 download(
                   `signal-scope-rule-hits-${rule.targetId}.csv`,
@@ -426,9 +429,7 @@ export function RulesView(props: {
                   'text/csv',
                 )
               }
-            >
-              Export hits CSV
-            </button>
+            />
           </div>
           <p data-testid="hits-summary">
             The rule fired on <strong>{out.hits.hits.length}</strong> of {out.hits.evaluated}{' '}
@@ -484,9 +485,10 @@ export function RulesView(props: {
         <div className="card">
           <div className="row-between">
             <h3>Backtest (historical, simplified)</h3>
-            <button
-              type="button"
-              onClick={() =>
+            <ExportButton
+              label="Export trades CSV"
+              restricted={hasRestricted(series, events)}
+              onExport={() =>
                 out.bt &&
                 download(
                   `signal-scope-backtest-${rule.targetId}.csv`,
@@ -494,9 +496,7 @@ export function RulesView(props: {
                   'text/csv',
                 )
               }
-            >
-              Export trades CSV
-            </button>
+            />
           </div>
           <div className="table-wrap">
             <table>

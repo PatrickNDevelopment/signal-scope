@@ -36,7 +36,8 @@ as small.
   no-look-ahead assertion; if one fails, no results are shown.
 - **Saved work and exports.** Saved configurations, workspace JSON export and import, and CSV exports
   (event study, indicators, rule hits, backtest trades), each headed by provenance and parameter
-  comments and protected against spreadsheet formula injection.
+  comments and protected against spreadsheet formula injection. An export that contains data
+  labelled `restricted` stays disabled until you tick "Include restricted data".
 - **Sample market.** A seeded, synthetic market with invented companies, officials and a prediction
   market, marked by a banner and Sample badges wherever it appears.
 
@@ -53,7 +54,11 @@ npm run verify     # format, lint, types, unit tests, build, secret scan, e2e
 `scripts\verify.ps1` and `scripts/verify.sh` run the same steps and stop on the first failure.
 
 To try the import flow, use the invented example files in [examples/](examples): import
-`demo-prices.csv` as a price series with symbol `DEMO`, then `demo-catalysts.csv` as events.
+`demo-prices.csv` as a price series with symbol `DEMO` (a source is required; choose access
+"Synthetic" since the file is invented), then `demo-catalysts.csv` as events (labelled `synthetic`).
+
+Probabilities from another market (prediction markets) are dated but not timed, so a rule deciding at
+a session's close only uses probabilities dated **before** that session.
 
 ## The information-time rule
 

@@ -22,6 +22,7 @@ async function importDemo(page: Page): Promise<void> {
   const prices = page.getByRole('group', { name: /Import prices/ });
   await prices.getByLabel('Symbol').fill('DEMO');
   await prices.getByLabel('Source').fill('Example file (invented)');
+  await prices.getByLabel('Access').selectOption('synthetic');
   await prices.getByLabel('CSV file').setInputFiles(example('demo-prices.csv'));
   await expect(status(page)).toContainText('Imported 1 series (DEMO: 250 rows)');
   await page
@@ -77,7 +78,8 @@ test('journey 1: import prices and catalysts, run an event study, compare pre/po
   expect(text).toContain(
     '# Information time: day 0 is the first session strictly after publication',
   );
-  expect(text).toContain('# Series DEMO: Example file (invented) (access public, retrieved');
+  expect(text).toContain('# Series DEMO: Example file (invented) (access synthetic; retrieved');
+  expect(text).toContain('# Events from Example press release (invented) (access synthetic)');
   expect(text).toContain(
     'event_id,kind,label,event_date,published_at,delay_days,day0,baseline_from',
   );
@@ -290,6 +292,63 @@ test('empty states point to the Data page', async ({ page }) => {
     'aria-current',
     'page',
   );
+});
+
+test('the skip link focuses the content without changing the page', async ({ page }) => {
+  await loadSample(page);
+  await openView(page, 'Event study');
+  await page.reload(); // fresh focus: the first Tab reaches the skip link
+  await page.keyboard.press('Tab');
+  await expect(page.getByRole('link', { name: 'Skip to content' })).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('main')).toBeFocused();
+  await expect(page.getByRole('heading', { level: 2, name: 'Event study' })).toBeVisible();
+  expect(new URL(page.url()).hash).toBe('#/study');
+});
+
+test('restricted data needs an explicit opt-in before any export, and is announced in it', async ({
+  page,
+}) => {
+  await openView(page, 'Data');
+  const prices = page.getByRole('group', { name: /Import prices/ });
+  await prices.getByLabel('Symbol').fill('DEMO');
+  await prices.getByLabel('Source').fill('Licensed vendor, =HYPERLINK("http://e")');
+  await prices.getByLabel('Access').selectOption('restricted');
+  await prices.getByLabel('CSV file').setInputFiles(example('demo-prices.csv'));
+  await expect(status(page)).toContainText('Imported 1 series');
+  await openView(page, 'Indicators');
+  const exp = page.getByRole('button', { name: 'Export indicators CSV' });
+  await expect(exp).toBeDisabled();
+  await page.getByLabel('Include restricted data').check();
+  const { text } = await downloadText(page, () => exp.click());
+  expect(text).toContain('# CONTAINS DATA LABELLED RESTRICTED');
+  expect(text).toContain('Licensed vendor; =HYPERLINK(');
+  expect(text).not.toMatch(/,\s*=/);
+  await openView(page, 'Saved');
+  await expect(page.getByRole('button', { name: 'Export workspace JSON' })).toBeDisabled();
+});
+
+test.describe('in a time zone ahead of UTC', () => {
+  test.use({ timezoneId: 'Pacific/Kiritimati' });
+  test('the retrieval date defaults to the local date, and day 0 does not move', async ({
+    page,
+  }) => {
+    // 20:00 UTC on 18 October is already 19 October in Kiritimati (UTC+14).
+    await page.clock.setFixedTime(new Date('2026-10-18T20:00:00Z'));
+    await page.reload();
+    await openView(page, 'Data');
+    const prices = page.getByRole('group', { name: /Import prices/ });
+    await expect(prices.getByLabel('Retrieved on')).toHaveValue('2026-10-19');
+    await prices.getByLabel('Symbol').fill('DEMO');
+    await prices.getByLabel('Source').fill('Example file (invented)');
+    await prices.getByLabel('CSV file').setInputFiles(example('demo-prices.csv'));
+    await page
+      .getByRole('group', { name: /Import catalysts/ })
+      .getByLabel('CSV file')
+      .setInputFiles(example('demo-catalysts.csv'));
+    await expect(page.getByTestId('day0-demo-cat-1')).toHaveText('2022-04-26');
+    await expect(page.getByTestId('delay-demo-cat-1')).toHaveText('0');
+  });
 });
 
 test('mobile width has no horizontal page scroll on any page', async ({ page }) => {

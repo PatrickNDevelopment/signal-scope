@@ -5,10 +5,11 @@ Run `npm run dev` and open http://localhost:5176/signal-scope/.
 ## Journey 1: import, study, compare, export
 
 1. **Data** page. In "Import prices or probabilities": symbol `DEMO`, source
-   `Example file (invented)`, then choose `examples/demo-prices.csv`. The status line reports
-   250 rows; the series table shows one missing value.
-2. In "Import catalysts...", choose `examples/demo-catalysts.csv` (3 events). The events table shows
-   day 0 one session after each publication.
+   `Example file (invented)`, access `Synthetic (invented data)`, then choose
+   `examples/demo-prices.csv`. The status line reports 250 rows; the series table shows one missing
+   value.
+2. In "Import catalysts...", choose `examples/demo-catalysts.csv` (3 invented events, access
+   `synthetic`). The events table shows day 0 one session after each publication.
 3. **Event study.** Three catalysts are included; the cards compare pre CAR (days −5 to −1) with
    post CAR (day 0 to +5), each with n and a "very small sample" badge. The table shows each event's
    baseline window and n.

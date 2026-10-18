@@ -128,7 +128,13 @@ function prepare(rule: Rule, series: readonly Series[], events: readonly MarketE
         const pd = ps.points.map((p) => p.date);
         const dp = probChange(ps, c.h);
         return (t, used) => {
-          const j = lastOnOrBefore(pd, dates[t] as string);
+          // Another market's daily value is stamped with a date, not a time: a prediction market
+          // trades around the clock and its value for day t can be taken after the target's close
+          // on t. Conservatively, a decision at t's close only sees probabilities dated before t
+          // (the same "after the close" rule as for publications; docs/spec/00 rule 3).
+          const d = dates[t] as string;
+          let j = lastOnOrBefore(pd, d);
+          if (j >= 0 && pd[j] === d) j -= 1;
           if (j < 0) return false;
           used.push(pd[j] as string);
           const v = dp[j];
