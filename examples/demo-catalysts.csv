@@ -1,0 +1,4 @@
+id,kind,label,symbols,event_date,published_at,direction,source,access
+demo-cat-1,catalyst,"Example product news 1, invented",DEMO,2022-04-25,2022-04-25,up,Example press release (invented),public
+demo-cat-2,catalyst,"Example product news 2, invented",DEMO,2022-08-01,2022-08-01,down,Example press release (invented),public
+demo-cat-3,catalyst,"Example product news 3, invented",DEMO,2022-10-24,2022-10-24,up,Example press release (invented),public
