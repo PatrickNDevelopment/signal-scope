@@ -199,3 +199,14 @@ configured for Chromium on Ubuntu but has never run (no remote).
 - CI and Pages workflows (no remote).
 - Very large imports near the 20,000-row and 5 MB limits (the limits are enforced in code and the
   size checks are unit tested only for the error message path).
+
+## Publication and final audit
+
+The notes above that CI and Pages "have never run (no remote)" describe the state before
+publication and are superseded:
+
+- 2026-10-19: public repository https://github.com/PatrickNDevelopment/signal-scope created from the verified commit on `main`; the first CI run
+  (Ubuntu, Chromium) and the first Pages deployment were green. A live check of https://patrickndevelopment.github.io/signal-scope/ loaded the
+  app, reloaded it, and found no console errors and no requests to localhost.
+- 2026-10-20: the final cross-portfolio audit (a separate Claude Code session) ran the main journey
+  on the live demo, found no P0 or P1 issue, and saw the last three CI runs green.

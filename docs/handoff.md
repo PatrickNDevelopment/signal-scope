@@ -1,10 +1,9 @@
 # Handoff
 
-**State:** v0.1 built locally on branch `phase/05a-build`. Published 2026-10-19: https://github.com/PatrickNDevelopment/signal-scope (branch `main`), demo https://patrickndevelopment.github.io/signal-scope/; CI and Pages green on the first run.
-The independent acceptance review (05B, 2026-10-18) reran the gate from a clean clone, exercised
-both journeys on the production build, fixed eight defects with regression tests and found no
-blocking issue; see Part 1 of `docs/test-report.md`. The registry status is for the lead engineer to
-update after re-running that evidence.
+**State:** v0.1, accepted by an independent review (prompt 05B, 2026-10-18) that fixed eight defects with regression tests (see Part 1 / "Independent acceptance" in
+[test-report.md](test-report.md)). Published 2026-10-19: https://github.com/PatrickNDevelopment/signal-scope, branch `main`; demo
+https://patrickndevelopment.github.io/signal-scope/. CI and Pages are green; the final cross-portfolio audit (2026-10-20) found no
+P0 or P1 issue. The reviews were separate Claude Code sessions, not human audits.
 
 ## Run
 
