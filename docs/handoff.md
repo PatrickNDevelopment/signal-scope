@@ -1,6 +1,6 @@
 # Handoff
 
-**State:** v0.1 built locally on branch `phase/05a-build`. Not pushed, not deployed, no remote.
+**State:** v0.1 built locally on branch `phase/05a-build`. Published 2026-10-19: https://github.com/PatrickNDevelopment/signal-scope (branch `main`), demo https://patrickndevelopment.github.io/signal-scope/; CI and Pages green on the first run.
 The independent acceptance review (05B, 2026-10-18) reran the gate from a clean clone, exercised
 both journeys on the production build, fixed eight defects with regression tests and found no
 blocking issue; see Part 1 of `docs/test-report.md`. The registry status is for the lead engineer to
@@ -33,15 +33,15 @@ npm run e2e          # production build + Playwright on port 4177
 
 ## What is absent
 
-- No hosted demo; CI and Pages workflows have never run (no remote).
+- Hosted demo: https://patrickndevelopment.github.io/signal-scope/ (static build). CI and Pages ran green on the first push (2026-10-19).
 - No live or authorized data adapters (see docs/backlog.md).
 
-## Release blockers before publication
+## Publication
 
-1. ~~Independent acceptance review (05B).~~ Done; lead engineer to re-run `scripts\verify.ps1`
-   and update `portfolio-control/projects.json`.
-2. Owner review and explicit approval to publish.
-3. First CI run on Linux.
+Published 2026-10-19 with the owner's approval (portfolio decision D-007): public repository
+https://github.com/PatrickNDevelopment/signal-scope (MIT, branch `main`), GitHub Pages at https://patrickndevelopment.github.io/signal-scope/. The
+first CI run (Linux, Chromium) and Pages deployment were green; a live check loaded the demo,
+refreshed it and found no console errors and no requests to localhost.
 
 ## Gotchas
 

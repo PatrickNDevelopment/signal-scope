@@ -15,7 +15,7 @@
 - **Storage is per browser.** `localStorage` limits (about 5 MB in most browsers) bound workspace
   size; the app reports a failed save and asks you to export JSON.
 - **No live or authorized data adapters**; all data are imported files or the synthetic sample.
-- CI and the Pages workflow exist but have never run, because the repository has no remote.
+- **Published 2026-10-19.** CI (Linux, Chromium) and the Pages deploy were green on the first run.
 - **Same-day cross-market data is held back one session.** Prediction-market probabilities dated on
   a signal session are not used until the next session (dates carry no time). For a market that
   closes with the target this is one session conservative.

@@ -8,7 +8,7 @@ as small.
 
 ![SignalScope event study on desktop](docs/screenshots/study-desktop.png)
 
-> **Status:** v0.1, built and tested locally. It is **not published or deployed**; run it locally
+> **Status:** v0.1, published. **[Try the demo](https://patrickndevelopment.github.io/signal-scope/)** or run it locally
 > (below). It is a descriptive, historical tool. It does not forecast, recommend or trade, and it
 > makes no claim of guaranteed or multiplied returns. **Not investment advice.**
 
