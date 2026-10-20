@@ -25,3 +25,8 @@
   change), flagged "very few trades"; it is not evidence that the rule avoided losses.
 - **The train/test split assigns trades by entry date**, so a signal on the last train session whose
   entry falls after the split counts as test. There is no walk-forward evaluation.
+- **Shared browser storage on the demo site.** All ten portfolio demos are served from
+  `patrickndevelopment.github.io`, so they share one browser storage quota (about 5 MB). Each app
+  uses its own `signal-scope.*` keys and only reacts to changes of its own keys, but a very large workspace
+  in one demo can make saving fail in another (the app then shows its save-failed notice). A local
+  run has its own origin and is not affected.
